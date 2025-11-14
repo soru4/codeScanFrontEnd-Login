@@ -6,51 +6,73 @@ import {
   Text,
   TextInput,
   TouchableHighlight,
+  Alert,
 } from "react-native";
 import React from "react";
-import { HelloWave } from "@/components/hello-wave";
-import ParallaxScrollView from "@/components/parallax-scroll-view";
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
-import { Link } from "expo-router";
-import { NavigationContainer } from "@react-navigation/native";
 import { useRouter } from "expo-router";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const AUTH_TOKEN_KEY = 'current_auth_username'; 
+
+
+const LOGIN_URL = "https://Codescan.pythonanywhere.com/api/users/login/";
 
 export default function LoginScreen() {
   const [userName, onChangeUserName] = React.useState("");
   const [passWord, onChangePassword] = React.useState("");
-
   const router = useRouter();
 
-  const loginPressed = () => {
-    console.log("Username:", userName);
-    console.log("Password:", passWord);
-    
-    const response = fetch("https://Codescan.pythonanywhere.com/api/users/login/", {
-      method: "POST",
-      body: JSON.stringify({
-        username: userName,
-        pass: passWord,
-        
-      }),
-      headers: {
-        "Content-type": "application/json; charset=UTF-8",
-      },
-    });
+  const loginPressed = async() => {
+    if (!userName || !passWord) {
+        Alert.alert("Error", "Please enter both username and password.");
+        return;
+    }
 
-    console.log("Response:", response);
-    router.navigate("/emailVerification");
-    console.log("TouchableHighlight pressed!");
+    try {
+        const response = await fetch(LOGIN_URL, {
+            method: "POST",
+            body: JSON.stringify({
+                username: userName,
+                pass: passWord,
+            }),
+            headers: {
+                "Content-type": "application/json; charset=UTF-8",
+            },
+            credentials: 'include',
+        });
+
+        if (response.ok) {
+            await AsyncStorage.setItem(AUTH_TOKEN_KEY, userName);
+            console.log("SUCCESS: Username saved locally:", userName);
+            
+            Alert.alert("Success", "Logged in successfully.");
+            router.navigate("/emailVerification");
+
+        } else {
+            const errorData = await response.json().catch(() => ({}));
+            const errorMessage = errorData.error || `Server Error: ${response.status}`;
+            
+            if (response.status === 401) {
+                Alert.alert("Login Failed", "Invalid username or password.");
+            } else {
+                Alert.alert("Login Error", errorMessage);
+                console.error("Server Login Error:", response.status, errorData);
+            }
+        }
+    } catch (error) {
+        console.error("Network or connection error:", error);
+        Alert.alert("Connection Error", "Could not connect to the server.");
+    }
   };
+
   const signUpPressed = () => {
     router.navigate("/createAccount");
-    console.log("TouchableHighlight pressed!");
   };
   const resetPasswordPressed = () => {
     router.navigate("/resetPassword1");
-    console.log("TouchableHighlight pressed!");
   };
+
+
   return (
     <View
       style={{ flex: 1, justifyContent: "space-between", alignItems: "center" }}
@@ -83,21 +105,14 @@ export default function LoginScreen() {
           Username:
         </Text>
         <TextInput
-          style={{
-            height: 40,
-            borderColor: "gray",
-            borderWidth: 1,
-            marginBottom: 20,
-            paddingLeft: 10,
-            width: "300%",
-            borderRadius: 8,
-            color: "white",
-          }}
+          style={styles.input}
           onChangeText={onChangeUserName}
           placeholder="Enter Username:"
+          placeholderTextColor={"gray"}
           value={userName}
         />
       </View>
+
       <View style={{ justifyContent: "center", alignItems: "center" }}>
         <Text
           style={{
@@ -109,26 +124,18 @@ export default function LoginScreen() {
         >
           Password:
         </Text>
-
         <TextInput
-          style={{
-            height: 40,
-            borderColor: "gray",
-            borderWidth: 1,
-            marginBottom: 20,
-            paddingLeft: 10,
-            width: "300%",
-            borderRadius: 8,
-            color: "white",
-          }}
+          style={styles.input}
           placeholder="Enter Password:"
+          placeholderTextColor={"gray"}
+          secureTextEntry={true}
           onChangeText={onChangePassword}
           value={passWord}
         />
       </View>
 
       <TouchableHighlight
-        style={{ width: "30%", alignItems: "center" }}
+        style={{ width: "80%", alignItems: "center" }}
         onPress={loginPressed}
       >
         <View
@@ -145,48 +152,57 @@ export default function LoginScreen() {
           </Text>
         </View>
       </TouchableHighlight>
+
       <TouchableHighlight
-        style={{ width: "20%", alignItems: "center" }}
+        style={styles.smallButtonWrapper}
         onPress={signUpPressed}
       >
-        <View
-          style={{
-            backgroundColor: "#824582",
-            padding: 2,
-            borderRadius: 20,
-            alignItems: "center",
-            width: "100%",
-          }}
-        >
-          <Text style={{ color: "white", fontSize: 18, fontWeight: "600" }}>
-            Create An Account!
-          </Text>
+        <View style={styles.smallButton}>
+          <Text style={styles.smallButtonText}>Create An Account!</Text>
         </View>
       </TouchableHighlight>
+
       <TouchableHighlight
-        style={{ width: "20%", alignItems: "center" }}
+        style={styles.smallButtonWrapper}
         onPress={resetPasswordPressed}
       >
-        <View
-          style={{
-            backgroundColor: "#824582",
-            padding: 2,
-            borderRadius: 20,
-            alignItems: "center",
-            width: "100%",
-          }}
-        >
-          <Text style={{ color: "white", fontSize: 18, fontWeight: "600" }}>
-            Forgot Password!
-          </Text>
+        <View style={styles.smallButton}>
+          <Text style={styles.smallButtonText}>Forgot Password!</Text>
         </View>
       </TouchableHighlight>
+
       <View style={{ marginBottom: 50 }}></View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  input: {
+    height: 40,
+    borderColor: "gray",
+    borderWidth: 1,
+    marginBottom: 20,
+    paddingLeft: 10,
+    width: 300, 
+    borderRadius: 8,
+    color: "white",
+  },
+  smallButtonWrapper: {
+    width: "60%",
+    alignItems: "center",
+  },
+  smallButton: {
+    backgroundColor: "#824582",
+    padding: 5,
+    borderRadius: 20,
+    alignItems: "center",
+    width: "100%",
+  },
+  smallButtonText: {
+    color: "white",
+    fontSize: 14,
+    fontWeight: "600",
+  },
   titleContainer: {
     flexDirection: "row",
     alignItems: "center",

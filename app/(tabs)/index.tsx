@@ -16,14 +16,15 @@ import { Link } from "expo-router";
 import { NavigationContainer } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-
+import AsyncStorage from "@react-native-async-storage/async-storage";
 export default function HomeScreen() {
   const [userName, onChangeUserName] = React.useState("");
   const [passWord, onChangePassword] = React.useState("");
   const [number, onChangeNumber] = React.useState("");
+  const AUTH_TOKEN_KEY = 'current_auth_username'; 
   const router = useRouter();
-
-  const logoutPressed = () => {
+  
+  const logoutPressed = async() => {
     const response = fetch(
       "https://Codescan.pythonanywhere.com/api/users/logout/",
       {
@@ -34,6 +35,8 @@ export default function HomeScreen() {
         headers: {
           "Content-type": "application/json; charset=UTF-8",
         },});
+    await AsyncStorage.removeItem(AUTH_TOKEN_KEY);
+
     router.navigate("/logout");
     console.log("TouchableHighlight pressed!");
   }

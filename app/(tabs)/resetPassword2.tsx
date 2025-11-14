@@ -57,6 +57,7 @@ export default function ResetPassword1() {
         <TextInput
           style={{ height: 40, borderColor: 'gray', borderWidth: 1, marginBottom: 20, paddingLeft: 10, width: "300%", borderRadius: 8, color: "white"}}
           onChangeText={onChangePassword}
+          secureTextEntry={true}
           placeholder='Enter password:'
           value={pass}
       
@@ -67,6 +68,7 @@ export default function ResetPassword1() {
         <TextInput
           style={{ height: 40, borderColor: 'gray', borderWidth: 1, marginBottom: 20, paddingLeft: 10, width: "300%", borderRadius: 8, color: "white"}}
           onChangeText={onChangePassword1}
+          secureTextEntry={true}
           placeholder='Confirm password:'
           value={pass1}
       

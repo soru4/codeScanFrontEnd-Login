@@ -9,13 +9,15 @@ import { Link } from 'expo-router';
 import { NavigationContainer } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function EmailVerification() {
   const [userName, onChangeUserName] = React.useState('');
   const [code, onChangeCode] = React.useState('');
   
   const router = useRouter();
-  const verified = () => {
+  const verified = async () => {
+
      const response = fetch("https://Codescan.pythonanywhere.com/api/users/emailCheck/", {
       method: "POST",
       body: JSON.stringify({

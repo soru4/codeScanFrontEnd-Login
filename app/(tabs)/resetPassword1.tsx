@@ -26,8 +26,8 @@ export default function ResetPassword() {
       },
     });
     router.navigate({
-  pathname: "/resetPassword2", // Or just "/details" if it's a file-based route
-  params: { email: email }, // Pass the email as a parameter
+  pathname: "/resetPassword2", 
+  params: { email: email }, 
 });
     alert('Reset Link Sent!');
   }
