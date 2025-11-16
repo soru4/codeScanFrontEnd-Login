@@ -77,6 +77,8 @@ export default function LoginScreen() {
     <View
       style={{ flex: 1, justifyContent: "space-between", alignItems: "center" }}
     >
+            <Text style={{ color: "#474f7aff", fontSize:30, fontWeight:"bold"}}>C&lt;/&gt;de Scan</Text>
+            <Text style={{ color: "#616a9bff", fontSize:15, }}>N E V E R  S L I P  U P  A G A I N</Text>
       <View
         style={{
           backgroundColor: "#824582",

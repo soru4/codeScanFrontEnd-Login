@@ -42,6 +42,8 @@ export default function AccountPage({}: Props) {
 
   return (
     <View style={styles.container}> 
+           <Text style={{ color: "#474f7aff", fontSize:30, fontWeight:"bold"}}>C&lt;/&gt;de Scan</Text>
+           <Text style={{ color: "#616a9bff", fontSize:15, }}>N E V E R  S L I P  U P  A G A I N</Text>
       <Text style={styles.header}>Profile</Text>
       <Text style={styles.text}>Status: {status}</Text>
       <Text style={styles.text}>
